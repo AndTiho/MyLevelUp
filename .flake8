@@ -1,4 +1,4 @@
 [flake8]
-max-line-length = 119
+max-line-length = 138
 ignore = E203,W503
-exclude = .git, __pycache__, ./users/migrations, ./mailer/migrations,
+exclude = .git, __pycache__, ./users/migrations, ./mailer/migrations, ./.venv,
