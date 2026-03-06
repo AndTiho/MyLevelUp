@@ -1,6 +1,5 @@
 from celery import shared_task
 import requests
-from django.utils import timezone
 from django.utils.timezone import now
 from config import settings
 from habits.models import Habit
@@ -8,6 +7,7 @@ from habits.models import Habit
 
 @shared_task
 def send_telegram_message(chat_id, message):
+    """Отправка сообщения в телеграм"""
 
     params = {
         'text': message,
@@ -18,6 +18,7 @@ def send_telegram_message(chat_id, message):
 
 @shared_task
 def check_habits():
+    """Проверяет все привычки на предмет переодичности отправки и выполняет в назначенное время отложеную задачу."""
 
     current_time = now().time()
     today = now().date()
@@ -26,15 +27,13 @@ def check_habits():
     for habit in habits:
 
         last_run = (habit.last_run or habit.created_at).date()
-
         days_passed = (today - last_run).days
 
         if (
-            habit.time.hour == current_time.hour
-            and habit.time.minute == current_time.minute
-            and days_passed >= habit.periodicity
+                habit.time.hour == current_time.hour
+                and habit.time.minute == current_time.minute
+                and days_passed >= habit.periodicity
         ):
-
             send_telegram_message.delay(
                 habit.user.tg_chat_id,
                 f"Пора выполнить привычку: {habit.action}"

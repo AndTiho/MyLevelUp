@@ -5,11 +5,12 @@ from rest_framework.generics import (CreateAPIView, DestroyAPIView,
 
 from habits.models import Habit
 from habits.paginators import MyPaginator
-from habits.serializers import HabitSerializer
+from habits.serializers import HabitSerializer, HabitListSerializer
 from users.permissions import IsOwner
 
 
 class HabitsCreateAPIView(CreateAPIView):
+    """Создание привычки с автоматическим присвоением поля авторизованного пользователя"""
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
 
@@ -21,7 +22,7 @@ class HabitsListAPIView(ListAPIView):
     """ Это у нас вывод списка через ИИ =)
     Выдаёт список своих + публичных привычек"""
 
-    serializer_class = HabitSerializer
+    serializer_class = HabitListSerializer
     pagination_class = MyPaginator
 
     def get_queryset(self):
@@ -33,18 +34,22 @@ class HabitsListAPIView(ListAPIView):
 
 
 class HabitsDetailAPIView(RetrieveAPIView):
+    """ Подробные детали одной привычки"""
+
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
     permission_classes = [IsOwner]
 
 
 class HabitsUpdateAPIView(UpdateAPIView):
+    """Редактировать привычку"""
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
     permission_classes = [IsOwner]
 
 
 class HabitsDeleteAPIView(DestroyAPIView):
+    """Удалить привычку"""
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
     permission_classes = [IsOwner]

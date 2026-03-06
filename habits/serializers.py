@@ -2,6 +2,12 @@ from rest_framework import serializers
 
 from habits.models import Habit
 
+class HabitListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Habit
+        fields = ["id", "user", "action", "is_public"]
+
 
 class HabitSerializer(serializers.ModelSerializer):
 
