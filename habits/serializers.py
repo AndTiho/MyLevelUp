@@ -17,6 +17,10 @@ class HabitSerializer(serializers.ModelSerializer):
         periodicity = data.get("periodicity")
 
         # 1. Нельзя одновременно reward и related_habit
+        if self.instance:
+            reward = reward if reward is not None else self.instance.reward
+            related_habit = related_habit if related_habit is not None else self.instance.related_habit
+
         if reward and related_habit:
             raise serializers.ValidationError(
                 "Нельзя одновременно указывать вознаграждение и связанную привычку."

@@ -8,6 +8,8 @@ class Habit(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         related_name="habits",
         verbose_name="Пользователь",
     )
