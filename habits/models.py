@@ -45,6 +45,8 @@ class Habit(models.Model):
     is_public = models.BooleanField(default=False, verbose_name="Публичная привычка")
 
     created_at = models.DateTimeField(auto_now_add=True)
+    last_run = models.DateField(null=True, blank=True)
+
 
     def __str__(self):
         return f"Я буду {self.action} в {self.time} в {self.place}"
