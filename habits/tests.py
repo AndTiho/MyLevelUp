@@ -164,7 +164,7 @@ class HabitsAPITestCase(APITestCase):
 
         # 1. Нельзя одновременно reward и related_habit
         response = self.client.patch(f"/habits/update/{self.habit_1.id}/",
-                                     data={"reward": "Test", "related_habit": self.habit_2_is_public.id}, format="json")
+                                     data={"reward": "Test", "related_habit": self.habit_1_is_pleasant_1.id}, format="json")
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data["non_field_errors"][0],
@@ -215,8 +215,8 @@ class HabitsAPITestCase(APITestCase):
         )
 
         # 6. Нельзя привязывать саму себя
-        response = self.client.patch(f"/habits/update/{self.habit_1.id}/",
-                                     data={"related_habit": self.habit_1.id}, format="json")
+        response = self.client.patch(f"/habits/update/{self.habit_1_is_pleasant.id}/",
+                                     data={"related_habit": self.habit_1_is_pleasant.id}, format="json")
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data["non_field_errors"][0],

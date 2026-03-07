@@ -44,8 +44,8 @@ class Habit(models.Model):
 
     is_public = models.BooleanField(default=False, verbose_name="Публичная привычка")
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_run = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания привычки")
+    last_run = models.DateField(null=True, blank=True, verbose_name="Дата последнего оповещения привычки")
 
 
     def __str__(self):

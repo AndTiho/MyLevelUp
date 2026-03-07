@@ -10,6 +10,10 @@ class UserAPITestCase(APITestCase):
         self.user_1 = User.objects.create_user(username='test_user_1', password='123')
         self.user_2 = User.objects.create_user(username='test_user_2', password='123')
 
+    def tearDown(self):
+        """Сносим всё до начала тестов каждый раз, чтобы небыло конфликтов"""
+        User.objects.all().delete()
+
     def test_create_user(self):
         """Тестим создание пользователя"""
 
@@ -30,6 +34,7 @@ class UserAPITestCase(APITestCase):
 
 
     def test_update_permissions_user(self):
+        """Тест на права доступа к внесению изменений в модель юзера"""
 
         # Основные данные для патча
         data = {
