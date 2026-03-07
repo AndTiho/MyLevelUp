@@ -4,7 +4,8 @@ from rest_framework.generics import (CreateAPIView, DestroyAPIView,
 from rest_framework.permissions import AllowAny
 
 from users.models import User
-from users.serializers import UserSerializer
+from users.permissions import IsOwner
+from users.serializers import UserSerializer, UserDetailSerializer
 
 
 class UserCreateAPIView(CreateAPIView):
@@ -31,21 +32,15 @@ class UserDetailAPIView(RetrieveAPIView):
     """Детальный просмотр пользователя"""
 
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailSerializer
 
 
 class UserUpdateAPIView(UpdateAPIView):
     """Изменение данных пользователя"""
 
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    def get_object(self):
-        # Разрешаем редактировать только свой профиль
-        obj = super().get_object()
-        if obj != self.request.user:
-            self.permission_denied()
-        return obj
+    serializer_class = UserDetailSerializer
+    permission_classes = [IsOwner]
 
 
 class UserDeleteAPIView(DestroyAPIView):
@@ -53,3 +48,4 @@ class UserDeleteAPIView(DestroyAPIView):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsOwner]

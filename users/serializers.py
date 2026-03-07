@@ -10,3 +10,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ("id", "username", "email", "password")
         extra_kwargs = {"password": {"write_only": True}}
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    """Сериализатор для детального осмотра User"""
+    class Meta:
+        model = User
+        fields = '__all__'
+        extra_kwargs = {"password": {"write_only": True}}

@@ -6,7 +6,7 @@ from rest_framework.generics import (CreateAPIView, DestroyAPIView,
 from habits.models import Habit
 from habits.paginators import MyPaginator
 from habits.serializers import HabitSerializer, HabitListSerializer
-from users.permissions import IsOwner
+from habits.permissions import IsOwner
 
 
 class HabitsCreateAPIView(CreateAPIView):
