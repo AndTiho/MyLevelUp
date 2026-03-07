@@ -38,6 +38,12 @@ class HabitSerializer(serializers.ModelSerializer):
                 "Время выполнения не может превышать 120 секунд."
             )
 
+        # 6!. Нельзя привязывать саму себя
+        if self.instance and related_habit and related_habit.id == self.instance.id:
+            raise serializers.ValidationError(
+                "Нельзя привязывать привычку к самой себе."
+            )
+
         # 3. Связанная привычка должна быть приятной
         if related_habit and not related_habit.is_pleasant:
             raise serializers.ValidationError(
@@ -45,6 +51,11 @@ class HabitSerializer(serializers.ModelSerializer):
             )
 
         # 4. У приятной привычки не может быть reward или related_habit
+        if self.instance:
+            reward = reward if reward is not None else self.instance.reward
+            related_habit = related_habit if related_habit is not None else self.instance.related_habit
+            is_pleasant = is_pleasant if is_pleasant is not None else self.instance.is_pleasant
+
         if is_pleasant and (reward or related_habit):
             raise serializers.ValidationError(
                 "У приятной привычки не может быть вознаграждения или связанной привычки."
@@ -55,5 +66,6 @@ class HabitSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Нельзя выполнять привычку реже чем 1 раз в 7 дней."
             )
+
 
         return data

@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "rest_framework",
     'django_celery_beat',
+    'corsheaders',
+    'drf_yasg',
     "users",
     "habits",
 ]
@@ -72,6 +74,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 SIMPLE_JWT = {
@@ -158,8 +161,18 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BEAT_SCHEDULE = {
     'check-habits-every-hour': {
         'task': 'habits.tasks.check_habits',
-        'schedule': crontab(minute='*/1') # hour=0, minute=0 minute='*/1'
+        'schedule': crontab(minute='*/1')  # hour=0, minute=0 minute='*/1'
     },
 }
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+]
+
+CORS_ALLOW_ALL_ORIGINS = False
