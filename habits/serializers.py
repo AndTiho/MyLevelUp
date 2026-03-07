@@ -28,8 +28,14 @@ class HabitSerializer(serializers.ModelSerializer):
 
         if self.instance:
             reward = reward if reward is not None else self.instance.reward
-            related_habit = related_habit if related_habit is not None else self.instance.related_habit
-            is_pleasant = is_pleasant if is_pleasant is not None else self.instance.is_pleasant
+            related_habit = (
+                related_habit
+                if related_habit is not None
+                else self.instance.related_habit
+            )
+            is_pleasant = (
+                is_pleasant if is_pleasant is not None else self.instance.is_pleasant
+            )
 
         if reward and related_habit:
             raise serializers.ValidationError(

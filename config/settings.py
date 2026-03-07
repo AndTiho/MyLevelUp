@@ -45,9 +45,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework_simplejwt",
     "rest_framework",
-    'django_celery_beat',
-    'corsheaders',
-    'drf_yasg',
+    "django_celery_beat",
+    "corsheaders",
+    "drf_yasg",
     "users",
     "habits",
 ]
@@ -74,7 +74,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 SIMPLE_JWT = {
@@ -153,19 +153,19 @@ TELEGRAM_URL = "https://api.telegram.org/bot"
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 CELERY_TIMEZONE = "Europe/Moscow"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
 CELERY_BEAT_SCHEDULE = {
-    'check-habits-every-hour': {
-        'task': 'habits.tasks.check_habits',
-        'schedule': crontab(minute='*/1')  # hour=0, minute=0 minute='*/1'
+    "check-habits-every-hour": {
+        "task": "habits.tasks.check_habits",
+        "schedule": crontab(minute="*/1"),  # hour=0, minute=0 minute='*/1'
     },
 }
 
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",

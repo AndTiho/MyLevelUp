@@ -6,10 +6,7 @@ class User(AbstractUser):
     """Стандартная модель пользователя, без каких либо требований."""
 
     tg_chat_id = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        verbose_name="Телеграм chat_id"
+        max_length=100, blank=True, null=True, verbose_name="Телеграм chat_id"
     )
 
     def __str__(self):
@@ -19,4 +16,3 @@ class User(AbstractUser):
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
         ordering = ["username"]
-

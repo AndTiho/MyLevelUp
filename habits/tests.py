@@ -9,20 +9,47 @@ from users.models import User
 class HabitsAPITestCase(APITestCase):
 
     def setUp(self):
-        self.user_1 = User.objects.create_user(username='test_user_1', password='123')
-        self.user_2 = User.objects.create_user(username='test_user_2', password='123')
-        self.habit_1 = Habit.objects.create(place='Test', time='15:00', action='Test', execution_time=60,
-                                            user=self.user_1)
-        self.habit_2_is_public = Habit.objects.create(place='Test', time='15:00', action='Test', execution_time=60,
-                                                      is_public=True,
-                                                      user=self.user_2)
-        self.habit_1_is_pleasant = Habit.objects.create(place='Test', time='15:00', action='Test', execution_time=60,
-                                                        is_pleasant=True, user=self.user_1)
-        self.habit_1_is_pleasant_1 = Habit.objects.create(place='Test', time='15:00', action='Test', execution_time=60,
-                                                        is_pleasant=True, user=self.user_1)
-        self.habit_1_with_reward = Habit.objects.create(place='Test', time='15:00', action='Test', execution_time=60,
-                                                        reward='test',
-                                                        user=self.user_1)
+        self.user_1 = User.objects.create_user(username="test_user_1", password="123")
+        self.user_2 = User.objects.create_user(username="test_user_2", password="123")
+        self.habit_1 = Habit.objects.create(
+            place="Test",
+            time="15:00",
+            action="Test",
+            execution_time=60,
+            user=self.user_1,
+        )
+        self.habit_2_is_public = Habit.objects.create(
+            place="Test",
+            time="15:00",
+            action="Test",
+            execution_time=60,
+            is_public=True,
+            user=self.user_2,
+        )
+        self.habit_1_is_pleasant = Habit.objects.create(
+            place="Test",
+            time="15:00",
+            action="Test",
+            execution_time=60,
+            is_pleasant=True,
+            user=self.user_1,
+        )
+        self.habit_1_is_pleasant_1 = Habit.objects.create(
+            place="Test",
+            time="15:00",
+            action="Test",
+            execution_time=60,
+            is_pleasant=True,
+            user=self.user_1,
+        )
+        self.habit_1_with_reward = Habit.objects.create(
+            place="Test",
+            time="15:00",
+            action="Test",
+            execution_time=60,
+            reward="test",
+            user=self.user_1,
+        )
 
     def tearDown(self):
         """Сносим всё до начала тестов каждый раз, чтобы небыло конфликтов"""
@@ -33,10 +60,10 @@ class HabitsAPITestCase(APITestCase):
 
         # Основные данные для привычки
         data = {
-            'place': 'Test',
-            'time': '15:00',
-            'action': 'Test',
-            'execution_time': '60'
+            "place": "Test",
+            "time": "15:00",
+            "action": "Test",
+            "execution_time": "60",
         }
 
         # Проверяем, что у не авторизованного пользователя нет на это прав
@@ -66,17 +93,23 @@ class HabitsAPITestCase(APITestCase):
         }
 
         # Проверяем, что у не авторизованного пользователя нет на это прав
-        response = self.client.patch(f"/habits/update/{self.habit_1.id}/", data=data, format="json")
+        response = self.client.patch(
+            f"/habits/update/{self.habit_1.id}/", data=data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # Проверяем, что у пользователя не владельца тоже нет прав на изменение привычки
         self.client.force_authenticate(user=self.user_2)
-        response = self.client.patch(f"/habits/update/{self.habit_1.id}/", data=data, format="json")
+        response = self.client.patch(
+            f"/habits/update/{self.habit_1.id}/", data=data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # Продолжаем тестирование, авторизуя пользователя
         self.client.force_authenticate(user=self.user_1)
-        response = self.client.patch(f"/habits/update/{self.habit_1.id}/", data=data, format="json")
+        response = self.client.patch(
+            f"/habits/update/{self.habit_1.id}/", data=data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(response.data["place"], "Test place updated")
@@ -104,7 +137,7 @@ class HabitsAPITestCase(APITestCase):
         self.assertEqual(
             response.json(),
             {
-                "id": response.data['id'],
+                "id": response.data["id"],
                 "place": "Test",
                 "time": "15:00:00",
                 "action": "Test",
@@ -113,46 +146,52 @@ class HabitsAPITestCase(APITestCase):
                 "reward": None,
                 "execution_time": 60,
                 "is_public": False,
-                "created_at": response.data['created_at'],
+                "created_at": response.data["created_at"],
                 "last_run": None,
-                "user": response.data['user'],
-                "related_habit": None
-            }
+                "user": response.data["user"],
+                "related_habit": None,
+            },
         )
 
     def test_delete_habit(self):
         """Тестируем удаление привычки"""
 
         # Проверяем, что у не авторизованного пользователя нет на это прав
-        response = self.client.delete(f"/habits/delete/{self.habit_1.id}/", format="json")
+        response = self.client.delete(
+            f"/habits/delete/{self.habit_1.id}/", format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # Проверяем, что у пользователя не владельца тоже нет прав на это права
         self.client.force_authenticate(user=self.user_2)
-        response = self.client.delete(f"/habits/delete/{self.habit_1.id}/", format="json")
+        response = self.client.delete(
+            f"/habits/delete/{self.habit_1.id}/", format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # Продолжаем тестирование, авторизуя пользователя
         self.client.force_authenticate(user=self.user_1)
-        response = self.client.delete(f"/habits/delete/{self.habit_1.id}/", format="json")
+        response = self.client.delete(
+            f"/habits/delete/{self.habit_1.id}/", format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_list_habit(self):
         """Тестируем вывод списка привычек"""
 
         # Проверяем, что у не авторизованного пользователя нет на это прав
-        response = self.client.get(f"/habits/", format="json")
+        response = self.client.get("/habits/", format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # Проверяем, что пользователь не владелец видит только свои привычки
         self.client.force_authenticate(user=self.user_2)
-        response = self.client.get(f"/habits/", format="json")
+        response = self.client.get("/habits/", format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
 
         # Проверяем, что пользователь видит свои привычки и привычки с признаком is_public, то есть все
         self.client.force_authenticate(user=self.user_1)
-        response = self.client.get(f"/habits/", format="json")
+        response = self.client.get("/habits/", format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 5)
 
@@ -163,64 +202,85 @@ class HabitsAPITestCase(APITestCase):
         self.client.force_authenticate(user=self.user_1)
 
         # 1. Нельзя одновременно reward и related_habit
-        response = self.client.patch(f"/habits/update/{self.habit_1.id}/",
-                                     data={"reward": "Test", "related_habit": self.habit_1_is_pleasant_1.id}, format="json")
+        response = self.client.patch(
+            f"/habits/update/{self.habit_1.id}/",
+            data={"reward": "Test", "related_habit": self.habit_1_is_pleasant_1.id},
+            format="json",
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data["non_field_errors"][0],
-            "Нельзя одновременно указывать вознаграждение и связанную привычку."
+            "Нельзя одновременно указывать вознаграждение и связанную привычку.",
         )
 
         # 2. Время выполнения <= 120 секунд
-        response = self.client.patch(f"/habits/update/{self.habit_1.id}/", data={"execution_time": 121}, format="json")
+        response = self.client.patch(
+            f"/habits/update/{self.habit_1.id}/",
+            data={"execution_time": 121},
+            format="json",
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data["non_field_errors"][0],
-            "Время выполнения не может превышать 120 секунд."
+            "Время выполнения не может превышать 120 секунд.",
         )
 
         # 3. Связанная привычка должна быть приятной
-        response = self.client.patch(f"/habits/update/{self.habit_1.id}/",
-                                     data={"related_habit": self.habit_2_is_public.id}, format="json")
+        response = self.client.patch(
+            f"/habits/update/{self.habit_1.id}/",
+            data={"related_habit": self.habit_2_is_public.id},
+            format="json",
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data["non_field_errors"][0],
-            "Связанная привычка должна быть приятной."
+            "Связанная привычка должна быть приятной.",
         )
 
         # 4. У приятной привычки не может быть reward
-        response = self.client.patch(f"/habits/update/{self.habit_1_is_pleasant.id}/", data={"reward": "Test"},
-                                     format="json")
+        response = self.client.patch(
+            f"/habits/update/{self.habit_1_is_pleasant.id}/",
+            data={"reward": "Test"},
+            format="json",
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data["non_field_errors"][0],
-            "У приятной привычки не может быть вознаграждения или связанной привычки."
+            "У приятной привычки не может быть вознаграждения или связанной привычки.",
         )
 
         # 4. У приятной привычки не может быть related_habit
-        response = self.client.patch(f"/habits/update/{self.habit_1_is_pleasant.id}/",
-                                     data={"related_habit": self.habit_1_is_pleasant_1.id}, format="json")
+        response = self.client.patch(
+            f"/habits/update/{self.habit_1_is_pleasant.id}/",
+            data={"related_habit": self.habit_1_is_pleasant_1.id},
+            format="json",
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data["non_field_errors"][0],
-            "У приятной привычки не может быть вознаграждения или связанной привычки."
+            "У приятной привычки не может быть вознаграждения или связанной привычки.",
         )
 
         # 5. Нельзя реже чем 1 раз в 7 дней
-        response = self.client.patch(f"/habits/update/{self.habit_1.id}/", data={"periodicity": 8}, format="json")
+        response = self.client.patch(
+            f"/habits/update/{self.habit_1.id}/", data={"periodicity": 8}, format="json"
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data["non_field_errors"][0],
-            "Нельзя выполнять привычку реже чем 1 раз в 7 дней."
+            "Нельзя выполнять привычку реже чем 1 раз в 7 дней.",
         )
 
         # 6. Нельзя привязывать саму себя
-        response = self.client.patch(f"/habits/update/{self.habit_1_is_pleasant.id}/",
-                                     data={"related_habit": self.habit_1_is_pleasant.id}, format="json")
+        response = self.client.patch(
+            f"/habits/update/{self.habit_1_is_pleasant.id}/",
+            data={"related_habit": self.habit_1_is_pleasant.id},
+            format="json",
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data["non_field_errors"][0],
-            "Нельзя привязывать привычку к самой себе."
+            "Нельзя привязывать привычку к самой себе.",
         )
 
     def test_other_some_code(self):

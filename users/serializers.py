@@ -14,7 +14,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
     """Сериализатор для детального осмотра User"""
+
     class Meta:
         model = User
-        fields = '__all__'
+        fields = "__all__"
         extra_kwargs = {"password": {"write_only": True}}

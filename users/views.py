@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 
 from users.models import User
 from users.permissions import IsOwner
-from users.serializers import UserSerializer, UserDetailSerializer
+from users.serializers import UserDetailSerializer, UserSerializer
 
 
 class UserCreateAPIView(CreateAPIView):

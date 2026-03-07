@@ -3,6 +3,7 @@ from rest_framework.exceptions import ValidationError
 
 class HabitValidator:
     """Класс валидатор вынесен для не заграмождения Сериализатора"""
+
     def __call__(self, data):
 
         execution_time = data.get("execution_time")
@@ -17,6 +18,5 @@ class HabitValidator:
 
         if related_habit and not related_habit.is_pleasant:
             raise ValidationError("Связанная привычка должна быть приятной.")
-
 
         return data
