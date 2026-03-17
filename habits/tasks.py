@@ -6,8 +6,12 @@ from config import settings
 from habits.models import Habit
 
 
-@shared_task(bind=True, autoretry_for=(requests.RequestException,),
-             retry_backoff=10, retry_kwargs={"max_retries": 5})
+@shared_task(
+    bind=True,
+    autoretry_for=(requests.RequestException,),
+    retry_backoff=10,
+    retry_kwargs={"max_retries": 5},
+)
 def send_telegram_message(self, chat_id, message):
     """Отправка сообщения в телеграм"""
 
@@ -19,13 +23,11 @@ def send_telegram_message(self, chat_id, message):
     response = requests.get(
         f"{settings.TELEGRAM_URL}{settings.TELEGRAM_TOKEN}/sendMessage",
         params=params,
-        timeout=10
+        timeout=10,
     )
 
     if response.status_code != 200:
-        raise Exception(
-            f"Telegram API error: {response.status_code} {response.text}"
-        )
+        raise Exception(f"Telegram API error: {response.status_code} {response.text}")
 
 
 @shared_task
@@ -34,7 +36,7 @@ def check_habits():
 
     current_time = now().time()
     today = now().date()
-    habits = Habit.objects.select_related('user').filter(user__tg_chat_id__isnull=False)
+    habits = Habit.objects.select_related("user").filter(user__tg_chat_id__isnull=False)
 
     for habit in habits:
 
