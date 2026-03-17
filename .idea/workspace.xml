@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1967d53d-fc50-4b14-b442-986d4873e03a" name="Changes" comment="2nd try autodeploy">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.MD" beforeDir="false" afterPath="$PROJECT_DIR$/README.MD" afterDir="false" />
+    <list default="true" id="1967d53d-fc50-4b14-b442-986d4873e03a" name="Changes" comment="3d try autodeploy (final)">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/ci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/ci.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,13 +113,22 @@
       <option name="project" value="LOCAL" />
       <updated>1773745178960</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="3d try autodeploy (final)">
+      <option name="closed" value="true" />
+      <created>1773746444046</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1773746444046</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fight with black" />
     <MESSAGE value="1st try autodeploy" />
     <MESSAGE value="2nd try autodeploy" />
-    <option name="LAST_COMMIT_MESSAGE" value="2nd try autodeploy" />
+    <MESSAGE value="3d try autodeploy (final)" />
+    <option name="LAST_COMMIT_MESSAGE" value="3d try autodeploy (final)" />
   </component>
 </project>
