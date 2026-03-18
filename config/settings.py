@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = True if os.getenv("DEBUG") == "True" else False
 
 ALLOWED_HOSTS = [
-    "158.160.79.58",
+    "158.160.78.91",
     "localhost",
     "127.0.0.1",
 ]
@@ -182,7 +182,7 @@ CORS_ALLOWED_ORIGINS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
-    "http://158.160.79.58",
+    "http://158.160.78.91",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False
