@@ -40,31 +40,39 @@ http://158.160.79.58/admin/
 
 ### 1. Клонирование репозитория
 
+```
 git clone https://github.com/AndTiho/MyLevelUp.git
 cd MyLevelUp
+```
 
 ### 2. Создание файла `.env`
 
-Создайте файл `.env` в корне проекта:
+Файл `.env` создается автоматически при деплое.  
+Чувствительные данные берутся из GitHub Secrets.
 
-SECRET_KEY=
+Пример содержимого:
+
+```env
+SECRET_KEY=${{ secrets.SECRET_KEY }}
 DEBUG=False
-POSTGRES_DB=
+POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
 POSTGRES_HOST=db
-POSTGRES_USER=
-POSTGRES_PASSWORD=
 POSTGRES_PORT=5432
-EMAIL_HOST_USER=
-EMAIL_HOST_PASSWORD=
-STRIPE_API_KEY=
-TELEGRAM_TOKEN=
+EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}
+EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}
+STRIPE_API_KEY=${{ secrets.STRIPE_API_KEY }}
+TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
 CELERY_BROKER_URL=redis://redis:6379/0
 CELERY_RESULT_BACKEND=redis://redis:6379/0
-
+```
 
 ### 3. Запуск через Docker Compose
 
+```
 docker compose up --build
+```
 
 После запуска приложение будет доступно по адресу:
 
@@ -76,12 +84,12 @@ http://localhost
 
 Проект разбит на сервисы:
 
-- web — Django + Gunicorn
-- db — PostgreSQL
-- redis — брокер сообщений
-- celery — обработка фоновых задач
-- celery-beat — планировщик задач
-- nginx — проксирование и раздача статики
+- `web` — Django + Gunicorn
+- `db` — PostgreSQL
+- `redis` — брокер сообщений
+- `celery` — обработка фоновых задач
+- `celery-beat` — планировщик задач
+- `nginx` — проксирование и раздача статики
 
 ---
 
@@ -93,53 +101,176 @@ http://localhost
 
 1. Линтинг кода (black, flake8)
 2. Запуск тестов
-3. Сборка Docker-образов
+3. Проверка сборки Docker-образов
 4. Автоматический деплой на сервер
 
----
+### Когда происходят проверки
 
-## 🚀 Деплой на сервер
+Проверки происходят при:
+```
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
+```
 
-Деплой происходит автоматически при push в ветку:
+### Когда происходит деплой
 
-feature/course_project_5
+Деплой выполняется при push в ветку:
 
-### Что происходит:
+```
+main
+```
 
-- GitHub Actions подключается к серверу по SSH
-- Выполняется git pull
-- Пересобираются контейнеры
-- Перезапускается проект:
+### Что делает GitHub Actions
 
+- Подключается к серверу по SSH  
+- Обновляет код (`git pull`)  
+- Создает/обновляет файл `.env`  
+- Перезапускает контейнеры  
+
+Команды деплоя:
+
+```
+docker compose down
 docker compose up -d --build
+```
 
 ---
 
-## 🖥️ Настройка сервера
+## 🚀 Настройка сервера
 
-Для запуска проекта сервер должен содержать:
+Для запуска проекта на сервере должны быть установлены:
 
+- Git
 - Docker
-- Docker Compose
-- Клонированный репозиторий проекта
-- Настроенный .env файл
+- Docker Compose plugin
 
-### Клонирование проекта на сервер:
+Остальные сервисы (`PostgreSQL`, `Redis`, `Celery`, `Celery Beat`, `Nginx`, `web`)
+запускаются в контейнерах через `docker compose`.
 
+### Установить зависимости
+
+```
+sudo apt update && sudo apt upgrade -y
+sudo apt install git -y
+curl -fsSL https://get.docker.com | sh
+sudo systemctl enable docker
+sudo systemctl start docker
+```
+
+### Проверка
+
+```
+docker --version
+docker compose version
+```
+
+### Клонирование проекта
+
+```
 git clone https://github.com/AndTiho/MyLevelUp.git
 cd MyLevelUp
+```
+
+---
+
+## 🔐 Переменные окружения (.env)
+
+Для локального запуска `.env` создается вручную используя файл `env.exemple`.
+
+При CI/CD деплое `.env` автоматически формируется на сервере из GitHub Secrets.
+
+---
+
+## 🔑 GitHub Secrets
+
+Необходимо добавить в репозиторий:
+
+- `SSH_KEY`
+- `SERVER_USER`
+- `SERVER_IP`
+- `SECRET_KEY`
+- `DEBUG`
+- `POSTGRES_DB`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_PORT`
+
+Дополнительно (если используется):
+
+- `EMAIL_HOST_USER`
+- `EMAIL_HOST_PASSWORD`
+- `STRIPE_API_KEY`
+- `TELEGRAM_TOKEN`
+
+---
+
+## 🖥️ Проверка деплоя
+
+### Подключение к серверу
+
+```
+ssh <user>@<server_ip>
+```
+
+### Перейти в проект
+
+```
+cd /home/<user>/MyLevelUp
+```
+
+### Проверить контейнеры
+
+```
+docker compose ps
+```
+
+Должны быть запущены (все UP):
+
+- web
+- db
+- redis
+- celery
+- celery-beat
+- nginx
+
+### Логи
+
+```
+docker compose logs -f
+```
+
+или:
+
+```
+docker compose logs -f web
+```
+
+---
+
+## 🌐 Проверка работы
+
+Открыть в браузере:
+
+- http://<server_ip>
+- http://<server_ip>/admin/
+
+Если всё открывается — деплой успешен.
 
 ---
 
 ## 📚 Документация API
 
-После запуска доступна:
-
-- Swagger: http://localhost/swagger/
-- ReDoc: http://localhost/redoc/
+- http://<server_ip>/swagger/
+- http://<server_ip>/redoc/
 
 ---
 
-## Лицензия
+## 📄 Лицензия
 
 Проект распространяется без лицензии.
