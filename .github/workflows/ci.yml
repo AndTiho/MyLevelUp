@@ -115,10 +115,10 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} 'EOF'
-            cd /home/${{ secrets.SERVER_USER }}/MyLevelUp &&
-            git checkout feature/course_project_5 &&
-            git pull origin feature/course_project_5 &&
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            cd /home/${{ secrets.SERVER_USER }}/MyLevelUp
+            git checkout feature/course_project_5
+            git pull origin feature/course_project_5
           
             cat > .env <<EOL
             SECRET_KEY=${{ secrets.SECRET_KEY }}
@@ -139,4 +139,3 @@ jobs:
             docker compose down
             docker compose up -d --build
             EOF
-          '
