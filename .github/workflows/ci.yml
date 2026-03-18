@@ -115,11 +115,12 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} 'EOF'
             cd /home/${{ secrets.SERVER_USER }}/MyLevelUp &&
             git checkout feature/course_project_5 &&
             git pull origin feature/course_project_5 &&
-            cat > .env <<EOF
+          
+            cat > .env <<EOL
             SECRET_KEY=${{ secrets.SECRET_KEY }}
             DEBUG=False
             POSTGRES_DB=${{ secrets.POSTGRES_DB }}
@@ -133,7 +134,9 @@ jobs:
             TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
             CELERY_BROKER_URL=redis://redis:6379/0
             CELERY_RESULT_BACKEND=redis://redis:6379/0
-            EOF
-            docker compose down &&
+            EOL
+
+            docker compose down
             docker compose up -d --build
-          "
+            EOF
+          '
