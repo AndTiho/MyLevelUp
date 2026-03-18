@@ -1,0 +1,143 @@
+name: Django CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black flake8
+
+      - name: Run black
+        run: black . --check
+
+      - name: Run Flake8
+        run: flake8 .
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d test_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    env:
+      SECRET_KEY: test-secret-key
+      POSTGRES_DB: test_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: 5432
+      CELERY_BROKER_URL: redis://127.0.0.1:6379/0
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations
+        run: python manage.py migrate
+
+      - name: Run tests
+        run: python manage.py test
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Build Docker images
+        run: docker compose build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+            cd /home/${{ secrets.SERVER_USER }}/MyLevelUp &&
+            git checkout main &&
+            git pull origin main &&
+      
+            echo 'SECRET_KEY=${{ secrets.SECRET_KEY }}' > .env &&
+            echo 'DEBUG=False' >> .env &&
+            echo 'POSTGRES_DB=${{ secrets.POSTGRES_DB }}' >> .env &&
+            echo 'POSTGRES_USER=${{ secrets.POSTGRES_USER }}' >> .env &&
+            echo 'POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}' >> .env &&
+            echo 'POSTGRES_HOST=db' >> .env &&
+            echo 'POSTGRES_PORT=5432' >> .env &&
+            echo 'EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}' >> .env &&
+            echo 'EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}' >> .env &&
+            echo 'STRIPE_API_KEY=${{ secrets.STRIPE_API_KEY }}' >> .env &&
+            echo 'TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}' >> .env &&
+            echo 'CELERY_BROKER_URL=redis://redis:6379/0' >> .env &&
+            echo 'CELERY_RESULT_BACKEND=redis://redis:6379/0' >> .env &&
+      
+            docker compose down &&
+            docker compose up -d --build
+          "
